@@ -14,7 +14,7 @@ void setup() {
   //fullScreen();
   background(255);
   smooth(8);
-  frameRate(60);
+  //frameRate(60);
   fill(0);
   lines = new LinkedList<PVector>();
 }
@@ -27,7 +27,7 @@ void draw() {
   drawGUI();
   popMatrix();
   //draw every 30 seconds
-  if ( isAnimating && frameCount % 1 == 0 ) {
+  if ( isAnimating ) {
 
     if (isAnimationReady) {
       //reset animation 
@@ -38,9 +38,10 @@ void draw() {
       //reset saved points
       saveLine = new StringBuilder();
 
-      linesIt = (random(1)<.5)?lines.iterator():lines.descendingIterator(); 
+      //linesIt = (random(1)<.5)?lines.iterator():lines.descendingIterator(); 
+      linesIt = lines.iterator();
       if (linesIt.hasNext()) {
-      a = linesIt.next();
+        a = linesIt.next();
       }
       if (linesIt.hasNext()) {
         b = linesIt.next();
@@ -77,7 +78,6 @@ void mouseClicked() {
   strokeWeight(1);
 
   if ( !lines.isEmpty() ) {
-    println("test"+ mouseX+ " | " +mouseY);
     if (mouseX < 45 && mouseY < 50 ) {
       //play button pressed
       isAnimationReady = true;
@@ -91,22 +91,29 @@ void mouseClicked() {
       rect(55, 10, 10, 30);
       rect(75, 10, 10, 30);
     } else if ( mouseX > 95  && mouseX < 160  && mouseY < 50  && !isAnimating) {
-      // undo last line
+      // undo button
       linesIt = lines.descendingIterator();
       linesIt.next();
       while (linesIt.hasNext()) {
         linesIt.remove();
-        //println("elements removed: " + linesIt.next());
         if (linesIt.next().x == -9999) {
           break;
         }
       }
-    }else if( mouseX > 165  && mouseX < 225  && mouseY < 50){
+    } else if ( mouseX > 165  && mouseX < 225  && mouseY < 50) {
+      // clear sketch button
       lines.clear();
       isAnimating = true;
       isAnimationReady = true;
+    } else if ( mouseX > 230 && mouseX < 295 && mouseY < 50 ) {
+      //save to file button
+      saveStrings(new File("handwriting-animation"+random(1)+".txt"), new String[]{saveLine.toString()});
     }
+  } else if ( mouseX > 300 && mouseX< 355 && mouseY < 50 ) {
+    //open file button
+    selectInput("Select your ", "fileSelected");
   }
+
   if (!isAnimating && mouseY > 50) {
     //single tap
     addPoint();
@@ -141,48 +148,45 @@ void addPoint() {
   ellipse(x, y, 1, 1);
 }
 
-void keyPressed() { 
-  //println(key + "|" + keyCode );
-  if (!lines.isEmpty() && !isAnimating) {
-    if (keyCode == 524 || key == 'u') {
-      // undo last line
-      linesIt = lines.descendingIterator();
-      linesIt.next();
-      while (linesIt.hasNext()) {
-        linesIt.remove();
-        //println("elements removed: " + linesIt.next());
-        if (linesIt.next().x == -9999) {
-          break;
-        }
-      }
-    } else if (key == 'a') {
-      isAnimationReady = true;
-      isAnimating = true;
-    } else if (key == 'p') {  
-      saveStrings(new File("drawing.txt"), new String[]{saveLine.toString()});
-    }
-  } else if (key == 's' ) {
-    isAnimating = false;
-  }
-}
-
 void drawGUI() {
-  noStroke();
   line(0, 50, width, 50);
+  noStroke();
   fill(235, 80, 80);
   triangle(10, 10, 10, 40, 35, 25);
   fill(0);
   rect(55, 10, 10, 30);
   rect(75, 10, 10, 30);
+
   textFont(createFont("Arial", 16, true), 22);
-  fill(0,0,0,0);
+  fill(0, 0, 0, 0);
   stroke(1);
-  rect(95,10,60,30);
+  rect(95, 10, 60, 30);
   fill(0);
   text("undo", 100, 32);
-  //text("do", 105, 40);
-  fill(0,0,0,0);
-  rect(165,10,58,30);
-  fill(255,0,0);
-  text("clear",170,32);
+
+  fill(0, 0, 0, 0);
+  rect(165, 10, 58, 30);
+  fill(255, 0, 0);
+  text("clear", 170, 32);
+
+  fill(0, 0, 0, 0);
+  rect(233, 10, 58, 30);
+  fill(0);
+  text("save", 238, 32 ); 
+
+  fill(0, 0, 0, 0);
+  rect(300, 10, 58, 30);
+  fill(0);
+  text("open", 305, 32 );
+}
+
+void fileSelected(File selection) {
+  if (selection == null) {
+  } else {
+    String[] temp = loadStrings(new File(selection.getAbsolutePath()));
+ 
+    for(int i = 0; i < temp.length;i ++){
+    
+    }
+     }
 }
