@@ -38,8 +38,8 @@ void draw() {
       //reset saved points
       saveLine = new StringBuilder();
 
-      //linesIt = (random(1)<.5)?lines.iterator():lines.descendingIterator(); 
-      linesIt = lines.iterator();
+      linesIt = (random(1)<.5)?lines.iterator():lines.descendingIterator(); 
+      //linesIt = lines.iterator();
       if (linesIt.hasNext()) {
         a = linesIt.next();
       }
@@ -78,18 +78,18 @@ void mouseClicked() {
   strokeWeight(1);
 
   if ( !lines.isEmpty() ) {
-    if (mouseX < 45 && mouseY < 50 ) {
+    if (mouseX < 535 && mouseX > 500 && mouseY < 50 ) {
       //play button pressed
       isAnimationReady = true;
       isAnimating = true;
 
       fill(100, 255, 00);
-      triangle(10, 10, 10, 40, 35, 25);
-    } else if ( mouseX > 45  && mouseX < 90  && mouseY < 50  && isAnimating) {
+      triangle(500, 10, 500, 40, 535, 25);
+    } else if ( mouseX > 545  && mouseX < 590  && mouseY < 50  && isAnimating) {
       isAnimating = false;
       fill(200, 200, 200);
-      rect(55, 10, 10, 30);
-      rect(75, 10, 10, 30);
+      rect(555, 10, 10, 30);
+      rect(575, 10, 10, 30);
     } else if ( mouseX > 95  && mouseX < 160  && mouseY < 50  && !isAnimating) {
       // undo button
       linesIt = lines.descendingIterator();
@@ -100,6 +100,7 @@ void mouseClicked() {
           break;
         }
       }
+      show_lines();
     } else if ( mouseX > 165  && mouseX < 225  && mouseY < 50) {
       // clear sketch button
       lines.clear();
@@ -111,7 +112,7 @@ void mouseClicked() {
     }
   } else if ( mouseX > 300 && mouseX< 355 && mouseY < 50 ) {
     //open file button
-    selectInput("Select your ", "fileSelected");
+    selectInput("Select your previous drawing", "fileSelected");
   }
 
   if (!isAnimating && mouseY > 50) {
@@ -134,6 +135,7 @@ void mouseReleased() {
 
   if (!isAnimating &&  mouseY > 50) {
     lines.add(new PVector(-9999, -9999));
+    show_lines();
   }
 }
 
@@ -149,13 +151,14 @@ void addPoint() {
 }
 
 void drawGUI() {
+  strokeWeight(2);
   line(0, 50, width, 50);
   noStroke();
   fill(235, 80, 80);
-  triangle(10, 10, 10, 40, 35, 25);
+  triangle(500, 10, 500, 40, 535, 25);
   fill(0);
-  rect(55, 10, 10, 30);
-  rect(75, 10, 10, 30);
+  rect(555, 10, 10, 30);
+  rect(575, 10, 10, 30);
 
   textFont(createFont("Arial", 16, true), 22);
   fill(0, 0, 0, 0);
@@ -183,10 +186,48 @@ void drawGUI() {
 void fileSelected(File selection) {
   if (selection == null) {
   } else {
+    lines.clear();
     String[] temp = loadStrings(new File(selection.getAbsolutePath()));
- 
-    for(int i = 0; i < temp.length;i ++){
-    
+    //11,11->11,11
+    for (int i = 0; i < temp.length-1; i ++) {
+      String[] comma_seperated_points = temp[i].split("->");
+      String[] point_a = comma_seperated_points[0].split(",");
+      String[] point_b = comma_seperated_points[1].split(",");
+      lines.add(new PVector(Float.valueOf(point_a[0]), Float.valueOf(point_a[1])));
+      lines.add(new PVector(Float.valueOf(point_b[0]), Float.valueOf(point_b[1])));
     }
-     }
+  }
+}
+
+void show_lines() {
+  noStroke();
+  fill(255);
+  rect(0, 0, width, height);
+  fill(0);
+  stroke(1);
+  linesIt = (random(1)<.5)?lines.iterator():lines.descendingIterator(); 
+  //linesIt = lines.iterator();
+  if (linesIt.hasNext()) {
+    a = linesIt.next();
+  }
+  if (linesIt.hasNext()) {
+    b = linesIt.next();
+  }
+
+  while (linesIt.hasNext()) {
+
+    //if drawing starts with a dot, draw the dot seperately
+    a = b;
+
+    if (linesIt.hasNext()) { 
+      b = linesIt.next();
+    }
+
+    if (b.x != -9999 && a.x !=-9999) {
+      fill(0);
+      stroke(1);
+      strokeWeight(5);
+      line(a.x, a.y, b.x, b.y);
+    }
+  }
 }
