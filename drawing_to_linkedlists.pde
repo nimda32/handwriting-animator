@@ -7,12 +7,14 @@ Iterator<PVector> linesIt;
 boolean isAnimationReady = false;
 boolean isAnimating = false;
 StringBuilder saveLine = new StringBuilder();
-
+PVector a = new PVector(0, 0);
+PVector b = new PVector(0, 0);
+int i = 0;
 
 void setup() {
-  size(displayWidth, displayHeight);
-  //fullScreen();
-  //background(255);
+  //size(displayWidth, displayHeight);
+  fullScreen();
+  background(255);
   //smooth(8);
   //frameRate(200);
   fill(0);
@@ -20,16 +22,12 @@ void setup() {
   saveLine = new StringBuilder();
 }
 
-PVector a = new PVector(0, 0);
-PVector b = new PVector(0, 0);
-int i = 0;
 void draw() {
-  if(frameCount % 15 == 1){
+  if (frameCount % 15 == 1) {
     drawGUI();
   }
   //draw every 30 seconds
   if ( isAnimating ) {
-
     if (isAnimationReady) {
       //reset animation
       fill(255);
@@ -62,6 +60,8 @@ void draw() {
       //println(a.x+","+a.y+"->"+b.x+","+b.y);
 
       if (b.x != -9999 && a.x !=-9999) {
+        stroke(0);
+        strokeWeight(5);
         line(a.x, a.y, b.x, b.y);
       }
     } else {
@@ -88,13 +88,23 @@ void mouseClicked() {
     } else if ( mouseX > 95  && mouseX < 160  && mouseY < 50  && !isAnimating) {
       // undo button
       linesIt = lines.descendingIterator();
-      linesIt.next();
       while (linesIt.hasNext()) {
-        linesIt.remove();
-        if (linesIt.next().x == -9999) {
+        if (linesIt.next().x != -9999) {
+          linesIt.remove();
           break;
         }
       }
+      //String temp = "[";
+      float x = 0;
+      while (linesIt.hasNext() && x != -9999) {
+        x = linesIt.next().x;
+        //temp += " " + x + ", ";
+        linesIt.remove();
+        //println(temp);
+      }
+
+      //temp += "]";
+      //println(temp);
       show_lines();
     } else if ( mouseX > 165  && mouseX < 225  && mouseY < 50) {
       // clear sketch button
@@ -105,7 +115,7 @@ void mouseClicked() {
       //save to file button
       isAnimating = true;
       isAnimationReady = true;
-      
+
       selectOutput("Select a file to write to:", "saveTo");
     }
   } 
@@ -116,10 +126,8 @@ void mouseClicked() {
 
   if (!isAnimating && mouseY > 50) {
     //single tap
-    //addPoint();
     addPoint();
     addPoint();
-    lines.add(new PVector(-9999, -9999));
   }
 }
 
@@ -131,7 +139,6 @@ void mouseDragged() {
 
 void mouseReleased() {
   //delimiting point for spaces
-
   if (!isAnimating) {
     lines.add(new PVector(-9999, -9999));
     show_next_line();
@@ -146,13 +153,13 @@ void addPoint() {
   int y = mouseY;
 
   lines.add(new PVector(x, y));
-  rect(x, y, 1, 1);
+  ellipse(x, y, 1, 1);
 }
 
 
-void saveTo(File s){
-  if(s != null){
-     saveStrings(s, new String[]{saveLine.toString()});
+void saveTo(File s) {
+  if (s != null) {
+    saveStrings(s, new String[]{saveLine.toString()});
   }
 }
 
@@ -161,7 +168,7 @@ void fileSelected(File selection) {
     //lines.clear();
     lines.removeAll(lines);
     fill(255);
-    rect(0,0,width,height);
+    rect(0, 0, width, height);
     String[] temp = loadStrings(new File(selection.getAbsolutePath()));
     //11,11->11,11
     for (int i = 0; i < temp.length-1; i ++) {
@@ -175,23 +182,23 @@ void fileSelected(File selection) {
   }
 }
 
-void show_next_line(){
+void show_next_line() {
   noStroke();
   //fill(255);
   //rect(0, 0, width, height);
   fill(0);    
   stroke(1);
   strokeWeight(5);
-      
+
   linesIt = lines.descendingIterator();
-  
+
   if (linesIt.hasNext()) {
     a = linesIt.next();
   }
   if (linesIt.hasNext()) {
     b = linesIt.next();
   }
-  
+
   while (linesIt.hasNext()) {
     a = b;
     if (linesIt.hasNext()) {
@@ -200,7 +207,7 @@ void show_next_line(){
 
     if (b.x != -9999 && a.x !=-9999) {
       line(a.x, a.y, b.x, b.y);
-    }else{
+    } else {
       break;
     }
   }
@@ -219,7 +226,7 @@ void show_lines() {
   if (linesIt.hasNext()) {
     b = linesIt.next();
   }
- saveLine.setLength(0);
+  saveLine.setLength(0);
 
   while (linesIt.hasNext()) {
 
@@ -229,8 +236,8 @@ void show_lines() {
     if (linesIt.hasNext()) {
       b = linesIt.next();
     }
-        
-          saveLine.append(a.x+","+a.y+"->"+b.x+","+b.y+"\n");
+
+    saveLine.append(a.x+","+a.y+"->"+b.x+","+b.y+"\n");
 
 
     if (b.x != -9999 && a.x !=-9999) {
